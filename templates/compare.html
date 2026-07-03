@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Compare Biscuits — GreenPath{% endblock %}
+
+{% block extra_head %}
+<style>
+  .compare-hero {
+    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+    padding: 3rem 2rem; color: white;
+  }
+  .compare-hero h1 {
+    font-family: 'Playfair Display', serif; font-size: 2.25rem;
+    font-weight: 700; color: white;
+  }
+  .compare-hero p { color: rgba(255,255,255,0.7); margin-top: 0.5rem; }
+
+  .compare-container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  /* Product picker */
+  .picker-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .picker-card {
+    background: white; border: 2px dashed var(--border);
+    border-radius: 14px; padding: 1.25rem; text-align: center;
+    min-height: 120px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .picker-card.has-product { border-style: solid; border-color: var(--moss); text-align: left; }
+  .picker-card-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .picker-add { color: var(--moss); font-size: 2rem; line-height: 1; }
+  .picker-search {
+    width: 100%; padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; outline: none;
+  }
+  .picker-search:focus { border-color: var(--moss); }
+  .picker-results {
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; z-index: 50; box-shadow: var(--shadow-lg);
+    max-height: 200px; overflow-y: auto; display: none;
+  }
+  .picker-results a {
+    display: block; padding: 0.6rem 0.8rem;
+    font-size: 0.8rem; text-decoration: none; color: var(--text);
+    border-bottom: 1px solid var(--dew); cursor: pointer;
+  }
+  .picker-results a:hover { background: var(--dew); }
+  .picker-product-name { font-weight: 700; font-size: 0.85rem; color: var(--forest); }
+  .picker-product-brand { font-size: 0.7rem; color: var(--text-muted); }
+  .remove-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 1.2rem; align-self: flex-end;
+    padding: 0; transition: color 0.15s;
+  }
+  .remove-btn:hover { color: var(--lime-dark); }
+
+  /* COMPARISON TABLE */
+  .compare-table-wrap { overflow-x: auto; margin-top: 1rem; }
+  .compare-table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+  }
+  .compare-table th, .compare-table td {
+    padding: 0.9rem 1.25rem; text-align: center;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  .compare-table th {
+    background: var(--dew);
+    font-weight: 700; font-family: 'Playfair Display', serif; font-size: 0.95rem;
+    color: var(--forest); position: sticky; top: 64px; z-index: 10;
+  }
+  .compare-table th:first-child { text-align: left; }
+  .compare-table td:first-child {
+    text-align: left; font-weight: 600; color: var(--text-muted);
+    background: var(--snow); font-size: 0.8rem;
+  }
+  .compare-table tr:hover td { background: var(--dew); }
+  .compare-table tr:hover td:first-child { background: #f0e8d8; }
+  .best-cell { background: #DCFCE7 !important; color: #166534; font-weight: 700; }
+  .worst-cell { background: #FEE2E2 !important; color: #991B1B; }
+  .section-row td {
+    background: var(--forest) !important; color: white !important;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    font-size: 0.7rem; padding: 0.5rem 1.25rem;
+  }
+  .yes-cell { color: #166534; font-size: 1.1rem; }
+  .no-cell { color: #991B1B; font-size: 1.1rem; }
+
+  .empty-compare {
+    text-align: center; padding: 4rem 2rem;
+    background: white; border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  .empty-compare .icon { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="compare-hero">
+  <div style="max-width:1100px; margin:0 auto; padding:0 2rem;">
+    <h1>⚖️ Compare Products</h1>
+    <p>Add up to 4 products to compare their health, nutrition, and ingredient profiles side by side.</p>
+  </div>
+</div>
+
+<div class="compare-container">
+
+  {% if products %}
+  <!-- COMPARISON TABLE -->
+  <div class="compare-table-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          {% for p in products %}
+          <th>
+            <div style="font-size:0.7rem; color: var(--moss); text-transform:uppercase; font-family: 'Plus Jakarta Sans', sans-serif; font-weight:700;">{{ p.brand }}</div>
+            <div style="font-size:0.9rem;">{{ p.name[:30] }}{% if p.name|length > 30 %}…{% endif %}</div>
+            <div style="margin-top:0.5rem; display:flex; gap:0.4rem; justify-content:center;">
+              <a href="/product/{{ p.id }}" style="font-size:0.7rem; color: var(--moss);">Details →</a>
+            </div>
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <!-- SCORES -->
+        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Scores (Lower Health = Better)</td></tr>
+        <tr>
+          <td>Health Score</td>
+          {% set min_h = products|map(attribute='health_score_raw')|select('gt', 0)|min %}
+          {% set max_h = products|map(attribute='health_score_raw')|max %}
+          {% for p in products %}
+          <td {% if p.health_score_raw == min_h and min_h > 0 %}class="best-cell"{% elif p.health_score_raw == max_h %}class="worst-cell"{% endif %}>
+            {{ p.health_score_raw if p.health_score_raw else 'N/A' }}
+          </td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Health Grade</td>
+          {% for p in products %}
+          <td><span class="grade grade-{{ p.health_grade }}">{{ p.health_grade }}</span></td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Eco Score</td>
+          {% set max_e = products|map(attribute='eco_score_raw')|max %}
+          {% set min_e = products|map(attribute='eco_score_raw')|min %}
+          {% for p in products %}
+          <td {% if p.eco_score_raw == max_e %}class="best-cell"{% elif p.eco_score_raw == min_e and products|length > 1 %}class="worst-cell"{% endif %}>
+            {{ p.eco_score_raw if p.eco_score_raw else 'N/A' }}
+          </td>
+          {% endfor %}
+        </tr>
+
+        <!-- NUTRITION -->
+        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Nutrition (per 100g)</td></tr>
+        <tr>
+          <td>Energy (kcal)</td>
+          {% for p in products %}<td>{{ p.energy|int if p.energy else '—' }}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Fat (g)</td>
+          {% set min_f = products|map(attribute='fat')|min %}
+          {% for p in products %}
+          <td {% if p.fat == min_f and min_f > 0 %}class="best-cell"{% endif %}>{{ p.fat if p.fat else '—' }}</td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Protein (g)</td>
+          {% set max_p = products|map(attribute='protein')|max %}
+          {% for p in products %}
+          <td {% if p.protein == max_p and max_p > 0 %}class="best-cell"{% endif %}>{{ p.protein if p.protein else '—' }}</td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Carbs (g)</td>
+          {% for p in products %}<td>{{ p.carbs if p.carbs else '—' }}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Sugars (g)</td>
+          {% set min_s = products|map(attribute='sugars')|min %}
+          {% for p in products %}
+          <td {% if p.sugars == min_s and min_s >= 0 and products|length > 1 %}class="best-cell"{% endif %}>{{ p.sugars if p.sugars else '—' }}</td>
+          {% endfor %}
+        </tr>
+
+        <!-- ADDITIVES -->
+        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Additives & Ingredients</td></tr>
+        <tr>
+          <td>Added Sugar</td>
+          {% for p in products %}<td class="{% if not p.added_sugar %}yes-cell{% else %}no-cell{% endif %}">{% if not p.added_sugar %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Added Salt</td>
+          {% for p in products %}<td class="{% if not p.added_salt %}yes-cell{% else %}no-cell{% endif %}">{% if not p.added_salt %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Preservatives</td>
+          {% for p in products %}<td class="{% if not p.preservatives %}yes-cell{% else %}no-cell{% endif %}">{% if not p.preservatives %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Artificial Flavours</td>
+          {% for p in products %}<td class="{% if not p.artificial_flavours %}yes-cell{% else %}no-cell{% endif %}">{% if not p.artificial_flavours %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Artificial Colors</td>
+          {% for p in products %}<td class="{% if not p.artificial_colors %}yes-cell{% else %}no-cell{% endif %}">{% if not p.artificial_colors %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Trans Fat</td>
+          {% for p in products %}<td class="{% if not p.trans_fat %}yes-cell{% else %}no-cell{% endif %}">{% if not p.trans_fat %}✅{% else %}❌{% endif %}</td>{% endfor %}
+        </tr>
+
+        <!-- DIETARY -->
+        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Dietary Attributes</td></tr>
+        <tr>
+          <td>Vegan</td>
+          {% for p in products %}<td class="{% if p.vegan %}yes-cell{% else %}no-cell{% endif %}">{% if p.vegan %}✅{% else %}—{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Organic</td>
+          {% for p in products %}<td class="{% if p.organic %}yes-cell{% else %}no-cell{% endif %}">{% if p.organic %}✅{% else %}—{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Cruelty-Free</td>
+          {% for p in products %}<td class="{% if p.cruelty_free %}yes-cell{% else %}no-cell{% endif %}">{% if p.cruelty_free %}✅{% else %}—{% endif %}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>Origin</td>
+          {% for p in products %}<td>{{ p.origin_country or '—' }}</td>{% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
+    <a href="/recommend" class="btn btn-outline">← Back to Explore</a>
+    <button onclick="window.location.href='/compare'" class="btn btn-primary">New Comparison</button>
+  </div>
+
+  {% else %}
+  <div class="empty-compare">
+    <div class="icon">⚖️</div>
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:0.5rem;">Start Comparing</h2>
+    <p style="color: var(--text-muted); max-width:400px; margin:0 auto 1.5rem;">
+      Go to the <strong>Explore</strong> page and click "+ Compare" on any products, then come back here.
+    </p>
+    <a href="/recommend" class="btn btn-primary">Explore Products</a>
+  </div>
+
+  <!-- Quick search compare -->
+  <div style="max-width:600px; margin:2rem auto; background:white; border-radius:16px; border:1px solid var(--border); padding:2rem;">
+    <h3 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:1rem;">Or search directly:</h3>
+    <div style="position:relative;">
+      <input type="text" id="directSearch" placeholder="Search for a product..." 
+             style="width:100%; padding:0.75rem 1rem; border:1.5px solid var(--border); border-radius:8px; font-family: 'Plus Jakarta Sans', sans-serif; font-size:0.9rem; outline:none;">
+      <div id="directResults" style="position:absolute; top:110%; left:0; right:0; background:white; border-radius:8px; box-shadow:var(--shadow-lg); z-index:50; display:none; border:1px solid var(--border); overflow:hidden;"></div>
+    </div>
+    <p style="font-size:0.75rem; color: var(--text-muted); margin-top:0.75rem;">Select 2-4 products to compare them.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const sel = [];
+
+  const directInput = document.getElementById('directSearch');
+  const directResults = document.getElementById('directResults');
+  if (directInput) {
+    let to;
+    directInput.addEventListener('input', () => {
+      clearTimeout(to);
+      const q = directInput.value.trim();
+      if (q.length < 2) { directResults.style.display='none'; return; }
+      to = setTimeout(async () => {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (!data.length) { directResults.style.display='none'; return; }
+        directResults.innerHTML = data.map(p =>
+          `<div style="padding:0.75rem 1rem; cursor:pointer; border-bottom:1px solid var(--border); font-size:0.875rem;"
+                onclick="addToCompare('${p.id}')">
+            <strong>${p.name}</strong> <span style="color: var(--text-muted);">— ${p.brand}</span>
+          </div>`
+        ).join('');
+        directResults.style.display='block';
+      }, 250);
+    });
+    document.addEventListener('click', (e) => {
+      if (!directInput.contains(e.target)) directResults.style.display='none';
+    });
+  }
+
+  function addToCompare(id) {
+    if (sel.includes(id)) return;
+    if (sel.length >= 4) { showToast('Max 4 products'); return; }
+    sel.push(id);
+    directResults.style.display = 'none';
+    directInput.value = '';
+    if (sel.length >= 2) {
+      window.location.href = '/compare?' + sel.map(i => 'ids=' + i).join('&');
+    } else {
+      showToast('Add one more product to compare');
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}GreenPath — Make every choice count{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 55%, var(--forest-light) 100%);
+    padding: 5.5rem 2rem 0;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 10% 90%, rgba(126,200,69,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 10%, rgba(168,213,181,0.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  /* decorative leaf shapes */
+  .hero-leaf {
+    position: absolute; opacity: 0.06; pointer-events: none;
+    font-size: 12rem; line-height: 1;
+  }
+  .hero-leaf-1 { top: -2rem; right: 5%; transform: rotate(25deg); }
+  .hero-leaf-2 { bottom: 2rem; left: -2rem; transform: rotate(-15deg); font-size: 9rem; }
+  .hero-inner {
+    max-width: 780px; margin: 0 auto; text-align: center;
+    position: relative; z-index: 1;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(126,200,69,0.2); border: 1px solid rgba(126,200,69,0.4);
+    color: var(--lime); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.35rem 1.1rem; border-radius: 20px; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700; line-height: 1.1; color: white; margin-bottom: 1.25rem;
+  }
+  .hero h1 em { color: var(--lime); font-style: italic; }
+  .hero p { font-size: 1.1rem; color: rgba(255,255,255,0.72); max-width: 520px; margin: 0 auto 2.5rem; }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-hero {
+    padding: 0.9rem 2.25rem; font-size: 1rem; border-radius: 10px;
+    font-weight: 700; cursor: pointer; border: none; text-decoration: none;
+    font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.2s; display: inline-block;
+  }
+  .btn-hero-primary { background: var(--lime); color: var(--forest); }
+  .btn-hero-primary:hover { background: var(--lime-dark); color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(126,200,69,0.35); }
+  .btn-hero-ghost { background: transparent; border: 2px solid rgba(255,255,255,0.35); color: white; }
+  .btn-hero-ghost:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+  /* search */
+  .search-hero { max-width: 520px; margin: 2rem auto 0; position: relative; }
+  .search-hero input {
+    width: 100%; padding: 1rem 1.25rem 1rem 3.25rem;
+    border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1); color: white;
+    font-size: 1rem; font-family: 'Plus Jakarta Sans', sans-serif;
+    backdrop-filter: blur(10px); outline: none; transition: border-color 0.2s;
+  }
+  .search-hero input::placeholder { color: rgba(255,255,255,0.45); }
+  .search-hero input:focus { border-color: var(--lime); background: rgba(255,255,255,0.15); }
+  .search-hero .si { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); }
+  .search-results-hero {
+    position: absolute; top: 110%; left: 0; right: 0;
+    background: white; border-radius: 12px;
+    box-shadow: var(--shadow-lg); z-index: 50; overflow: hidden; display: none;
+    border: 1px solid var(--border);
+  }
+  .search-results-hero a {
+    display: block; padding: 0.8rem 1rem;
+    text-decoration: none; color: var(--text);
+    font-size: 0.875rem; border-bottom: 1px solid var(--mist); transition: background 0.15s;
+  }
+  .search-results-hero a:last-child { border-bottom: none; }
+  .search-results-hero a:hover { background: var(--dew); }
+  .search-results-hero a span { color: var(--text-muted); font-size: 0.8rem; }
+
+  /* stats wave */
+  .stats-wave {
+    margin-top: 3rem;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .stats-inner {
+    max-width: 800px; margin: 0 auto; padding: 1.5rem 2rem;
+    display: flex; justify-content: center; gap: 3.5rem; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--lime); display: block; }
+  .stat-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  /* how it works */
+  .how-section { background: var(--dew); }
+  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+  .how-card {
+    background: white; border-radius: 16px; padding: 2rem 1.5rem; text-align: center;
+    border: 1px solid var(--border); border-top: 3px solid var(--lime);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .how-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .how-icon { font-size: 2.4rem; margin-bottom: 0.875rem; display: block; }
+  .how-card h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--forest); margin-bottom: 0.5rem; }
+  .how-card p { font-size: 0.845rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* featured */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+  .product-card {
+    background: white; border-radius: 16px; border: 1px solid var(--border);
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+  }
+  .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .product-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--forest), var(--lime));
+  }
+  .product-brand { font-size: 0.72rem; font-weight: 700; color: var(--moss); text-transform: uppercase; letter-spacing: 0.07em; }
+  .product-name {
+    font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+    color: var(--forest); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .product-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+  .grades-row { display: flex; gap: 0.5rem; flex-shrink: 0; }
+  .grade-item { text-align: center; }
+  .grade-item-lbl { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+  .nutr-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .nutr-chip { font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 5px; background: var(--dew); color: var(--text-muted); }
+  .nutr-chip span { color: var(--forest); }
+  .product-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .concern-tag { font-size: 0.69rem; font-weight: 600; background: #FEF3C7; color: #92400E; padding: 0.15rem 0.5rem; border-radius: 4px; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--mist); }
+  .product-link { font-size: 0.84rem; font-weight: 600; color: var(--forest-light); text-decoration: none; }
+  .product-link:hover { color: var(--lime-dark); }
+
+  /* browse */
+  .browse-section { background: var(--forest); }
+  .browse-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .browse-card {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px; padding: 1.5rem 1rem; text-align: center;
+    cursor: pointer; text-decoration: none; color: white;
+    transition: all 0.2s;
+  }
+  .browse-card:hover { background: rgba(126,200,69,0.2); border-color: var(--lime); transform: translateY(-2px); }
+  .browse-card .bi { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+  .browse-card h3 { font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.9); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-leaf hero-leaf-1">🌿</span>
+  <span class="hero-leaf hero-leaf-2">🍃</span>
+  <div class="hero-inner fade-up">
+    <div class="hero-eyebrow">🌱 India's Eco-Smart Products Guide</div>
+    <h1>Snack <em>Smarter</em>,<br>Live Greener</h1>
+    <p>Discover healthier biscuits with transparent ingredients, real health scores & eco ratings — across {{ stats.total }}+ products.</p>
+    <div class="hero-actions">
+      <a href="/recommend?sort=health" class="btn-hero btn-hero-primary">Explore Products</a>
+      <a href="/ml-recommend" class="btn-hero btn-hero-ghost">🤖 Smart Pick</a>
+    </div>
+    <div class="search-hero">
+      <span class="si">🔍</span>
+      <input type="text" id="heroSearch" placeholder="Search brand or product..." autocomplete="off">
+      <div class="search-results-hero" id="heroResults"></div>
+    </div>
+  </div>
+  <div class="stats-wave">
+    <div class="stats-inner">
+      <div class="stat-item"><span class="stat-num">{{ stats.total }}+</span><span class="stat-lbl">Products</span></div>
+      <div class="stat-item"><span class="stat-num">{{ stats.brands }}</span><span class="stat-lbl">Brands</span></div>
+      <div class="stat-item"><span class="stat-num">{{ stats.vegan }}</span><span class="stat-lbl">Vegan Options</span></div>
+      <div class="stat-item"><span class="stat-num">{{ stats.no_preserv }}</span><span class="stat-lbl">No Preservatives</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section how-section">
+  <div class="container">
+    <div style="text-align:center;">
+      <h2 class="section-title">How <em>GreenPath</em> Works</h2>
+      <p class="section-sub">Every product analysed across health, ingredients & sustainability</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card"><span class="how-icon">🏷️</span><h3>Ingredient Analysis</h3><p>We flag refined flours, palm oils, artificial additives, trans fats and harmful chemicals.</p></div>
+      <div class="how-card"><span class="how-icon">💚</span><h3>Health Score</h3><p>Composite score based on nutrition quality, additives & processing. Higher = healthier.</p></div>
+      <div class="how-card"><span class="how-icon">🌿</span><h3>Eco Score</h3><p>Sustainability rating considering packaging, recyclability, eco certifications & origin.</p></div>
+      <div class="how-card"><span class="how-icon">🤖</span><h3>ML Recommendations</h3><p>Content-based filtering with cosine similarity matches you to your ideal product.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOP PICKS -->
+<div class="section">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:1rem; margin-bottom:0.5rem;">
+      <div><h2 class="section-title">🏆 Top-Rated <em>Picks</em></h2><p class="section-sub">Highest health scores from our dataset</p></div>
+      <a href="/recommend?sort=health" class="btn btn-outline">View All →</a>
+    </div>
+    <div class="products-grid">
+      {% for p in featured %}
+      <div class="product-card" style="animation: fadeUp 0.4s ease {{ loop.index0 * 0.07 }}s both;">
+        <div class="product-top">
+          <div style="flex:1;min-width:0;">
+            <div class="product-brand">{{ p.brand }}</div>
+            <div class="product-name" title="{{ p.name }}">{{ p.name }}</div>
+          </div>
+          <div class="grades-row">
+            <div class="grade-item"><div class="grade grade-{{ p.health_grade }}">{{ p.health_grade }}</div><div class="grade-item-lbl">Health</div></div>
+            <div class="grade-item"><div class="grade grade-{{ p.eco_grade }}">{{ p.eco_grade }}</div><div class="grade-item-lbl">Eco</div></div>
+          </div>
+        </div>
+        {% if p.energy or p.protein %}
+        <div class="nutr-row">
+          {% if p.energy %}<span class="nutr-chip">⚡ <span>{{ p.energy|int }} kcal</span></span>{% endif %}
+          {% if p.protein %}<span class="nutr-chip">💪 <span>{{ p.protein }}g protein</span></span>{% endif %}
+          {% if p.fat %}<span class="nutr-chip">🫙 <span>{{ p.fat }}g fat</span></span>{% endif %}
+        </div>
+        {% endif %}
+        {% if p.badges %}<div class="product-badges">{% for b in p.badges[:3] %}<span class="badge badge-{{ b.color }}">{{ b.label }}</span>{% endfor %}</div>{% endif %}
+        {% if p.concerns %}<div class="product-badges">{% for c in p.concerns[:2] %}<span class="concern-tag">⚠ {{ c }}</span>{% endfor %}</div>{% endif %}
+        <div class="product-footer"><a href="/product/{{ p.id }}" class="product-link">View Details →</a></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- BROWSE -->
+<div class="section browse-section">
+  <div class="container">
+    <div style="text-align:center;">
+      <h2 class="section-title" style="color:white;">Browse by <em style="color:var(--lime);">Preference</em></h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.6);">Quick filters to find your perfect match</p>
+    </div>
+    <div class="browse-grid">
+      <a href="/recommend?no_artificial_colors=1&sort=health" class="browse-card"><span class="bi">🎨</span><h3>No Artificial Colors</h3></a>
+      <a href="/recommend?no_preservatives=1&sort=health" class="browse-card"><span class="bi">🧪</span><h3>No Preservatives</h3></a>
+      <a href="/recommend?no_trans_fat=1&sort=health" class="browse-card"><span class="bi">❤️</span><h3>Trans-Fat Free</h3></a>
+      <a href="/recommend?no_added_sugar=1&sort=health" class="browse-card"><span class="bi">🍬</span><h3>No Added Sugar</h3></a>
+      <a href="/recommend?vegan=1&sort=health" class="browse-card"><span class="bi">🌱</span><h3>Vegan</h3></a>
+      <a href="/recommend?sort=protein" class="browse-card"><span class="bi">💪</span><h3>High Protein</h3></a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const input = document.getElementById('heroSearch');
+  const results = document.getElementById('heroResults');
+  let timeout;
+  input.addEventListener('input', () => {
+    clearTimeout(timeout);
+    const q = input.value.trim();
+    if (q.length < 2) { results.style.display='none'; return; }
+    timeout = setTimeout(async () => {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      if (!data.length) { results.style.display='none'; return; }
+      results.innerHTML = data.map(p => `<a href="/product/${p.id}"><strong>${p.name}</strong> <span>— ${p.brand}</span></a>`).join('');
+      results.style.display='block';
+    }, 250);
+  });
+  document.addEventListener('click', e => { if (!input.contains(e.target)) results.style.display='none'; });
+  input.addEventListener('keydown', e => { if (e.key==='Enter' && input.value.trim()) window.location.href=`/recommend?query=${encodeURIComponent(input.value.trim())}`; });
+</script>
+{% endblock %}

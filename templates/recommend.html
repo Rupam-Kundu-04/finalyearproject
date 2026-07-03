@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block title %}Explore Products — GreenPath{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-header {
+    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+    padding: 3rem 2rem;
+    color: white;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.25rem; font-weight: 700;
+  }
+  .page-header p { color: rgba(255,255,255,0.7); margin-top: 0.5rem; }
+
+  .explore-layout {
+    max-width: 1200px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem; padding: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .explore-layout { grid-template-columns: 1fr; }
+    .filters-sidebar { position: static !important; }
+  }
+
+  .filters-sidebar {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: sticky; top: 80px;
+  }
+  .filter-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--forest); margin-bottom: 1.25rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .filter-section { margin-bottom: 1.5rem; }
+  .filter-section-title {
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+  }
+  .filter-check {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.35rem 0; cursor: pointer; font-size: 0.875rem;
+  }
+  .filter-check input { accent-color: var(--moss); width: 16px; height: 16px; cursor: pointer; }
+  .filter-check:hover { color: var(--moss); }
+  .filter-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .clear-btn {
+    font-size: 0.75rem; color: var(--text-muted);
+    background: none; border: none; cursor: pointer;
+    text-decoration: underline; padding: 0;
+  }
+  .clear-btn:hover { color: var(--lime-dark); }
+
+  /* SORT + RESULTS */
+  .results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+  }
+  .results-count { font-size: 0.9rem; color: var(--text-muted); }
+  .results-count strong { color: var(--text); font-size: 1rem; }
+  .sort-select {
+    padding: 0.5rem 1rem; border-radius: 8px;
+    border: 1.5px solid var(--border); background: white;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem;
+    color: var(--text); outline: none; cursor: pointer;
+  }
+  .sort-select:focus { border-color: var(--moss); }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .product-card {
+    background: white; border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 1.25rem; display: flex; flex-direction: column;
+    gap: 0.8rem; transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+  .product-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .product-brand { font-size: 0.7rem; font-weight: 700; color: var(--moss); text-transform: uppercase; letter-spacing: 0.06em; }
+  .product-name {
+    font-family: 'Playfair Display', serif; font-size: 0.95rem;
+    font-weight: 700; color: var(--forest); line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .grade-pair { display: flex; flex-direction: column; gap: 0.3rem; align-items: flex-end; flex-shrink: 0; }
+  .grade-mini {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.7rem; color: var(--text-muted);
+  }
+  .grade-mini .grade { width: 28px; height: 28px; font-size: 0.75rem; }
+
+  .nutr-mini { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .nutr-pill {
+    font-size: 0.7rem; font-weight: 600;
+    padding: 0.15rem 0.45rem; border-radius: 4px;
+    background: var(--dew); color: var(--text-muted);
+  }
+  .nutr-pill strong { color: var(--text); }
+
+  .badges-row { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .concerns-row { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .concern-mini {
+    font-size: 0.65rem; padding: 0.15rem 0.4rem;
+    border-radius: 3px; background: #FEF3C7; color: #92400E; font-weight: 600;
+  }
+
+  .card-footer {
+    margin-top: auto; display: flex;
+    align-items: center; justify-content: space-between;
+    padding-top: 0.75rem; border-top: 1px solid var(--border);
+  }
+  .view-btn {
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--moss); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .view-btn:hover { color: var(--lime-dark); }
+  .compare-btn {
+    font-size: 0.75rem; padding: 0.3rem 0.7rem;
+    border-radius: 6px; border: 1.5px solid var(--border);
+    background: none; cursor: pointer; color: var(--text-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s;
+  }
+  .compare-btn:hover { border-color: var(--moss); color: var(--moss); }
+  .compare-btn.added { background: var(--moss); color: white; border-color: var(--moss); }
+
+  .no-results {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+  .no-results .emoji { font-size: 3rem; margin-bottom: 1rem; }
+
+  /* SEARCH BAR */
+  .search-bar {
+    position: relative; margin-bottom: 1.5rem;
+  }
+  .search-bar input {
+    width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem;
+    outline: none; transition: border-color 0.2s; color: var(--text);
+  }
+  .search-bar input:focus { border-color: var(--moss); }
+  .search-bar .si {
+    position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="max-width:1200px; margin:0 auto; padding:0 2rem;">
+    <h1>🍪 Explore Biscuits</h1>
+    <p>{{ total }} results — use filters to find your perfect match</p>
+  </div>
+</div>
+
+<div class="explore-layout">
+  <!-- FILTERS -->
+  <aside class="filters-sidebar">
+    <form method="GET" action="/recommend" id="filterForm">
+      <div class="filter-heading">
+        Filters
+        <button type="button" class="clear-btn" onclick="clearFilters()">Clear all</button>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="filter-section">
+        <div class="filter-section-title">Search</div>
+        <div class="search-bar" style="margin-bottom:0;">
+          <span class="si">🔍</span>
+          <input type="text" name="query" id="queryInput"
+                 placeholder="Brand or product name..."
+                 value="{{ filters.query }}"
+                 style="padding-left:2.5rem;">
+        </div>
+      </div>
+
+      <!-- BRAND -->
+      <div class="filter-section">
+        <div class="filter-section-title">Brand</div>
+        <select name="brand" class="form-select" style="width:100%;">
+          <option value="">All Brands</option>
+          {% for brand in brands %}
+          <option value="{{ brand }}" {% if filters.brand == brand %}selected{% endif %}>{{ brand }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- SORT -->
+      <div class="filter-section">
+        <div class="filter-section-title">Sort By</div>
+        <select name="sort" class="form-select" style="width:100%;">
+          <option value="health" {% if filters.sort == 'health' %}selected{% endif %}>Best Health Score</option>
+          <option value="eco" {% if filters.sort == 'eco' %}selected{% endif %}>Best Eco Score</option>
+          <option value="protein" {% if filters.sort == 'protein' %}selected{% endif %}>Highest Protein</option>
+          <option value="low_sugar" {% if filters.sort == 'low_sugar' %}selected{% endif %}>Lowest Sugar</option>
+          <option value="low_fat" {% if filters.sort == 'low_fat' %}selected{% endif %}>Lowest Fat</option>
+          <option value="name" {% if filters.sort == 'name' %}selected{% endif %}>Name A–Z</option>
+        </select>
+      </div>
+
+      <!-- DIETARY -->
+      <div class="filter-section">
+        <div class="filter-section-title">Dietary</div>
+        <label class="filter-check">
+          <input type="checkbox" name="vegan" value="1" {% if filters.vegan %}checked{% endif %}> 🌱 Vegan
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="organic" value="1" {% if filters.organic %}checked{% endif %}> 🌿 Organic
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="cruelty_free" value="1" {% if filters.cruelty_free %}checked{% endif %}> 💚 Cruelty-Free
+        </label>
+      </div>
+
+      <!-- AVOID -->
+      <div class="filter-section">
+        <div class="filter-section-title">Avoid Ingredients</div>
+        <label class="filter-check">
+          <input type="checkbox" name="no_trans_fat" value="1" {% if filters.no_trans_fat %}checked{% endif %}> No Trans Fat
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="no_artificial_colors" value="1" {% if filters.no_artificial_colors %}checked{% endif %}> No Artificial Colors
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="no_preservatives" value="1" {% if filters.no_preservatives %}checked{% endif %}> No Preservatives
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="no_added_sugar" value="1" {% if filters.no_added_sugar %}checked{% endif %}> No Added Sugar
+        </label>
+        <label class="filter-check">
+          <input type="checkbox" name="no_artificial_flavours" value="1" {% if filters.no_artificial_flavours %}checked{% endif %}> No Artificial Flavours
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;">Apply Filters</button>
+    </form>
+  </aside>
+
+  <!-- RESULTS -->
+  <div>
+    <div class="results-header">
+      <div class="results-count">
+        Showing <strong>{{ total }}</strong> product{{ 's' if total != 1 else '' }}
+        {% if filters.query %} for "<strong>{{ filters.query }}</strong>"{% endif %}
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <a href="/compare" class="btn btn-outline btn-sm" id="compareLink" style="display:none;">
+          Compare (<span id="compareCount">0</span>)
+        </a>
+      </div>
+    </div>
+
+    {% if products %}
+    <div class="products-grid" id="productsGrid">
+      {% for p in products %}
+      <div class="product-card" style="animation: fadeUp 0.3s ease {{ [loop.index0 * 0.04, 0.5] | min }}s both;">
+        <div class="product-header">
+          <div>
+            <div class="product-brand">{{ p.brand }}</div>
+            <div class="product-name">{{ p.name }}</div>
+          </div>
+          <div class="grade-pair">
+            <div class="grade-mini">
+              <div class="grade grade-{{ p.health_grade }}">{{ p.health_grade }}</div>
+              <span>Health</span>
+            </div>
+            <div class="grade-mini">
+              <div class="grade grade-{{ p.eco_grade }}">{{ p.eco_grade }}</div>
+              <span>Eco</span>
+            </div>
+          </div>
+        </div>
+
+        {% if p.energy or p.protein %}
+        <div class="nutr-mini">
+          {% if p.energy %}<span class="nutr-pill">⚡ <strong>{{ p.energy|int }}</strong> kcal</span>{% endif %}
+          {% if p.protein %}<span class="nutr-pill">💪 <strong>{{ p.protein }}g</strong> protein</span>{% endif %}
+          {% if p.sugars %}<span class="nutr-pill">🍬 <strong>{{ p.sugars }}g</strong> sugars</span>{% endif %}
+        </div>
+        {% endif %}
+
+        {% if p.badges %}
+        <div class="badges-row">
+          {% for b in p.badges[:3] %}<span class="badge badge-{{ b.color }}">{{ b.label }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if p.concerns %}
+        <div class="concerns-row">
+          {% for c in p.concerns[:3] %}<span class="concern-mini">⚠ {{ c }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card-footer">
+          <a href="/product/{{ p.id }}" class="view-btn">Details →</a>
+          <button class="compare-btn" onclick="toggleCompare('{{ p.id }}', '{{ p.name[:25] }}', this)">+ Compare</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-results">
+      <div class="emoji">🔍</div>
+      <h3 style="font-family: 'Playfair Display', serif; margin-bottom:0.5rem;">No products found</h3>
+      <p>Try adjusting your filters or search term.</p>
+      <a href="/recommend" class="btn btn-primary" style="margin-top:1.5rem; display:inline-flex;">Clear Filters</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Compare functionality
+  let compareIds = JSON.parse(localStorage.getItem('compareIds') || '[]');
+  
+  function updateCompareUI() {
+    const link = document.getElementById('compareLink');
+    const cnt = document.getElementById('compareCount');
+    if (compareIds.length > 0) {
+      link.style.display = 'inline-flex';
+      cnt.textContent = compareIds.length;
+      link.href = '/compare?ids=' + compareIds.map(i => i.id).join('&ids=');
+    } else {
+      link.style.display = 'none';
+    }
+    // Update buttons
+    document.querySelectorAll('.compare-btn').forEach(btn => {
+      const id = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+      const inList = compareIds.some(i => i.id === id);
+      btn.textContent = inList ? '✓ Added' : '+ Compare';
+      btn.classList.toggle('added', inList);
+    });
+  }
+
+  function toggleCompare(id, name, btn) {
+    const idx = compareIds.findIndex(i => i.id === id);
+    if (idx > -1) {
+      compareIds.splice(idx, 1);
+      showToast(`Removed from compare`);
+    } else {
+      if (compareIds.length >= 4) { showToast('Max 4 products for comparison'); return; }
+      compareIds.push({id, name});
+      showToast(`Added "${name}..." to compare`);
+    }
+    localStorage.setItem('compareIds', JSON.stringify(compareIds));
+    updateCompareUI();
+  }
+
+  updateCompareUI();
+
+  // Auto-submit form on filter change
+  document.querySelectorAll('select[name="brand"], select[name="sort"]').forEach(el => {
+    el.addEventListener('change', () => document.getElementById('filterForm').submit());
+  });
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => document.getElementById('filterForm').submit());
+  });
+
+  function clearFilters() {
+    window.location.href = '/recommend';
+  }
+</script>
+{% endblock %}

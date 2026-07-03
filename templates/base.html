@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GreenPath — Make every choice count{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --forest:       #1A3A2A;
+      --forest-mid:   #2D5C42;
+      --forest-light: #3D7A58;
+      --moss:         #4E9A6F;
+      --sage:         #7BBF95;
+      --fern:         #A8D5B5;
+      --mist:         #D6EDE0;
+      --dew:          #EBF7F0;
+      --snow:         #F7FDF9;
+      --white:        #FFFFFF;
+      --lime:         #7EC845;
+      --lime-dark:    #5FA832;
+      --lime-soft:    #C8EDAA;
+      --text:         #0F2318;
+      --text-mid:     #2D5C42;
+      --text-muted:   #5A8A6A;
+      --border:       #C2DFCC;
+      --shadow-sm:    0 2px 12px rgba(26,58,42,0.08);
+      --shadow:       0 4px 24px rgba(26,58,42,0.12);
+      --shadow-lg:    0 8px 48px rgba(26,58,42,0.18);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--snow);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234E9A6F' fill-opacity='0.035'%3E%3Cpath d='M40 0C18 0 0 18 0 40s18 40 40 40 40-18 40-40S62 0 40 0zm0 72C22.4 72 8 57.6 8 40S22.4 8 40 8s32 14.4 32 32-14.4 32-32 32z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    nav {
+      background: var(--forest);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+      border-bottom: 3px solid var(--lime-dark);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 66px;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem; font-weight: 700;
+      color: var(--lime); text-decoration: none;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .logo span { color: var(--white); font-style: italic; }
+    .nav-links { display: flex; gap: 0.2rem; align-items: center; }
+    .nav-links a {
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      padding: 0.45rem 0.85rem; border-radius: 7px; transition: all 0.2s;
+    }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-links a.active { background: rgba(126,200,69,0.18); color: var(--lime); }
+    .nav-smart {
+      background: var(--lime) !important; color: var(--forest) !important;
+      font-weight: 700 !important; border-radius: 20px !important;
+      padding: 0.4rem 1rem !important; margin-left: 0.25rem !important;
+    }
+    .nav-smart:hover { background: var(--lime-dark) !important; color: white !important; }
+    main { min-height: calc(100vh - 66px - 76px); }
+    footer {
+      background: var(--forest);
+      border-top: 3px solid var(--lime-dark);
+      color: rgba(255,255,255,0.5);
+      text-align: center; padding: 1.5rem; font-size: 0.82rem;
+    }
+    footer strong { color: var(--lime); }
+    footer a { color: var(--sage); text-decoration: none; }
+    footer a:hover { color: var(--lime); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .section { padding: 4rem 0; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.625rem 1.375rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      border: none; text-decoration: none; transition: all 0.2s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-primary { background: var(--lime); color: var(--forest); }
+    .btn-primary:hover { background: var(--lime-dark); color: white; transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-outline { background: transparent; border: 2px solid var(--forest-light); color: var(--forest-light); }
+    .btn-outline:hover { background: var(--forest-light); color: white; }
+    .btn-sm { padding: 0.4rem 0.875rem; font-size: 0.8rem; }
+    .btn-ghost { background: rgba(255,255,255,0.12); color: white; border: 1.5px solid rgba(255,255,255,0.3); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.22); }
+    .card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .grade {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      font-weight: 700; font-size: 1rem;
+      font-family: 'Playfair Display', serif;
+    }
+    .grade-A { background: var(--forest); color: var(--lime); }
+    .grade-B { background: var(--forest-mid); color: var(--lime-soft); }
+    .grade-C { background: #FEF9C3; color: #78500A; }
+    .grade-D { background: #FED7AA; color: #9A3412; }
+    .grade-F { background: #FEE2E2; color: #991B1B; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+    .badge-green   { background: var(--dew); color: var(--forest); border: 1px solid var(--fern); }
+    .badge-emerald { background: #D1FAE5; color: #065F46; }
+    .badge-teal    { background: var(--mist); color: var(--forest-mid); }
+    .badge-blue    { background: #DBEAFE; color: #1D4ED8; }
+    .badge-violet  { background: #EDE9FE; color: #6D28D9; }
+    .badge-amber   { background: #FEF3C7; color: #92400E; }
+    .badge-red     { background: #FEE2E2; color: #991B1B; }
+    .badge-gray    { background: #F3F4F6; color: #4B5563; }
+    .form-input, .form-select {
+      padding: 0.625rem 1rem; border: 1.5px solid var(--border);
+      border-radius: 8px; background: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--moss); box-shadow: 0 0 0 3px rgba(78,154,111,0.15);
+    }
+    .filter-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; padding: 0.3rem 0; }
+    .filter-check input { width: 16px; height: 16px; accent-color: var(--lime-dark); cursor: pointer; }
+    .filter-check:hover { color: var(--forest-light); }
+    .nutr-bar-bg { background: var(--mist); border-radius: 4px; height: 6px; overflow: hidden; }
+    .nutr-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .nutr-bar-fill.fat     { background: linear-gradient(90deg, #F59E0B, #EF4444); }
+    .nutr-bar-fill.protein { background: linear-gradient(90deg, var(--moss), var(--lime)); }
+    .nutr-bar-fill.carbs   { background: linear-gradient(90deg, var(--forest-light), var(--sage)); }
+    .nutr-bar-fill.sugar   { background: linear-gradient(90deg, #EC4899, #F43F5E); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--forest); }
+    .section-title em { color: var(--moss); font-style: italic; }
+    .section-sub { color: var(--text-muted); margin-top: 0.4rem; font-size: 0.95rem; }
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--forest); color: white;
+      padding: 0.75rem 1.25rem; border-radius: 10px;
+      box-shadow: var(--shadow-lg); z-index: 9999;
+      border-left: 4px solid var(--lime);
+      transform: translateY(100px); opacity: 0; transition: all 0.3s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 768px) { .nav-links { display: none; } .container { padding: 0 1rem; } .section { padding: 2rem 0; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.55s ease both; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="logo">🌿 Green<span>Path</span></a>
+      <div class="nav-links">
+        <a href="/"            {% if request.endpoint == 'index'          %}class="active"{% endif %}>Home</a>
+        <a href="/recommend"   {% if request.endpoint == 'recommend_page' %}class="active"{% endif %}>Explore</a>
+        <a href="/compare"     {% if request.endpoint == 'compare'        %}class="active"{% endif %}>Compare</a>
+        <a href="/ml-recommend" {% if request.endpoint == 'ml_recommend'  %}class="active nav-smart"{% else %}class="nav-smart"{% endif %}>🤖 Smart Pick</a>
+        <a href="/about"       {% if request.endpoint == 'about'          %}class="active"{% endif %}>About</a>
+      </div>
+    </div>
+  </nav>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>
+    <p>🌿 <strong>GreenPath</strong> &mdash; Smarter snacking for a healthier planet &bull; <a href="/about">About</a> &bull; <a href="/recommend">Explore</a></p>
+  </footer>
+  <div class="toast" id="toast"></div>
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — GreenPath{% endblock %}
+
+{% block extra_head %}
+<style>
+  .product-detail-hero {
+    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+    padding: 3rem 2rem;
+  }
+  .product-detail-hero .container { max-width: 1100px; margin: 0 auto; }
+  .breadcrumb {
+    font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; }
+  .breadcrumb a:hover { color: white; }
+  .product-hero-inner {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 2rem;
+  }
+  .product-hero-left { flex: 1; min-width: 260px; }
+  .product-hero-brand {
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
+    color: var(--sage); text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .product-hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700; color: white; line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  .product-hero-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .product-hero-right {
+    display: flex; gap: 1.5rem; align-items: center;
+    background: rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+  .hero-score-block { text-align: center; }
+  .hero-score-num {
+    font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700;
+    color: white; line-height: 1;
+  }
+  .hero-score-lbl {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6); margin-top: 0.25rem;
+  }
+  .hero-grade {
+    width: 56px; height: 56px; font-size: 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-family: 'Playfair Display', serif; font-weight: 700;
+  }
+  .score-divider { width: 1px; height: 60px; background: rgba(255,255,255,0.2); }
+
+  /* CONTENT GRID */
+  .detail-grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr;
+    gap: 1.5rem; padding: 2rem;
+  }
+  @media(max-width: 768px) {
+    .detail-grid { grid-template-columns: 1fr; padding: 1rem; }
+  }
+
+  .detail-card {
+    background: white; border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .detail-card-title {
+    font-family: 'Playfair Display', serif; font-size: 1.1rem;
+    font-weight: 700; color: var(--forest); margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem; border-bottom: 2px solid var(--dew);
+  }
+
+  /* NUTRITION TABLE */
+  .nutr-table { width: 100%; }
+  .nutr-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.6rem 0; border-bottom: 1px solid var(--dew);
+  }
+  .nutr-row:last-child { border-bottom: none; }
+  .nutr-label { font-size: 0.875rem; color: var(--text-muted); }
+  .nutr-val { font-weight: 700; font-size: 0.9rem; }
+  .nutr-bar-full { margin-top: 0.3rem; }
+  .nutr-bar-bg { background: var(--dew); border-radius: 4px; height: 7px; overflow: hidden; }
+  .nutr-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+  /* INGREDIENT FLAGS */
+  .flag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .flag-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.6rem 0.8rem; border-radius: 8px;
+    font-size: 0.825rem; font-weight: 500;
+  }
+  .flag-ok { background: #DCFCE7; color: #166534; }
+  .flag-warn { background: #FEF3C7; color: #92400E; }
+  .flag-bad { background: #FEE2E2; color: #991B1B; }
+  .flag-icon { font-size: 1rem; }
+
+  /* INGREDIENTS */
+  .ingredients-text {
+    font-size: 0.85rem; line-height: 1.7; color: var(--text-muted);
+    background: var(--dew); padding: 1rem; border-radius: 8px;
+  }
+
+  /* CONCERNS / BADGES */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .concern-tag-full {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.8rem; font-weight: 600;
+    padding: 0.3rem 0.75rem; border-radius: 6px;
+    background: #FEF3C7; color: #92400E;
+  }
+
+  /* ORIGIN */
+  .origin-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; margin-bottom: 0.5rem; }
+  .origin-icon { font-size: 1.2rem; }
+
+  /* SIMILAR */
+  .similar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 480px) { .similar-grid { grid-template-columns: 1fr; } }
+  .similar-card {
+    background: var(--dew); border-radius: 12px; padding: 1rem;
+    text-decoration: none; color: var(--text);
+    display: flex; flex-direction: column; gap: 0.4rem;
+    transition: transform 0.15s; border: 1px solid var(--border);
+  }
+  .similar-card:hover { transform: translateY(-2px); background: white; }
+  .similar-brand { font-size: 0.7rem; font-weight: 700; color: var(--moss); text-transform: uppercase; }
+  .similar-name { font-size: 0.85rem; font-weight: 600; color: var(--forest); }
+  .similar-grade-row { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<div class="product-detail-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> › <a href="/recommend">Explore</a> › {{ product.name[:30] }}...
+    </div>
+    <div class="product-hero-inner">
+      <div class="product-hero-left">
+        <div class="product-hero-brand">{{ product.brand }}</div>
+        <h1 class="product-hero-name">{{ product.name }}</h1>
+        <div class="product-hero-badges">
+          {% for b in product.badges %}
+          <span class="badge badge-{{ b.color }}" style="font-size:0.8rem;">{{ b.label }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="product-hero-right">
+        <div class="hero-score-block">
+          <div class="hero-grade grade-{{ product.health_grade }}" style="margin:0 auto 0.4rem;">{{ product.health_grade }}</div>
+          <div class="hero-score-num" style="font-size:1.75rem;">{{ product.health_score_raw }}</div>
+          <div class="hero-score-lbl">Health Score</div>
+        </div>
+        <div class="score-divider"></div>
+        <div class="hero-score-block">
+          <div class="hero-grade grade-{{ product.eco_grade }}" style="margin:0 auto 0.4rem;">{{ product.eco_grade }}</div>
+          <div class="hero-score-num" style="font-size:1.75rem;">{{ product.eco_score_raw }}</div>
+          <div class="hero-score-lbl">Eco Score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL GRID -->
+<div class="detail-grid">
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- NUTRITION -->
+    <div class="detail-card">
+      <div class="detail-card-title">📊 Nutritional Information <span style="font-size:0.75rem; font-weight:400; color: var(--text-muted);">(per 100g)</span></div>
+      {% if product.energy or product.protein %}
+      <div class="nutr-table">
+        {% if product.energy %}
+        <div class="nutr-row">
+          <span class="nutr-label">⚡ Energy</span>
+          <span class="nutr-val">{{ product.energy|int }} kcal</span>
+        </div>
+        {% endif %}
+        {% if product.fat %}
+        <div class="nutr-row">
+          <span class="nutr-label">🫙 Total Fat</span>
+          <div style="text-align:right; width:55%;">
+            <span class="nutr-val">{{ product.fat }}g</span>
+            <div class="nutr-bar-bg" style="margin-top:4px;">
+              <div class="nutr-bar-fill fat" style="width:{{ [product.fat * 2.5, 100]|min }}%; background: linear-gradient(90deg, #F59E0B, #EF4444);"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if product.protein %}
+        <div class="nutr-row">
+          <span class="nutr-label">💪 Protein</span>
+          <div style="text-align:right; width:55%;">
+            <span class="nutr-val">{{ product.protein }}g</span>
+            <div class="nutr-bar-bg" style="margin-top:4px;">
+              <div class="nutr-bar-fill protein" style="width:{{ [product.protein * 5, 100]|min }}%; background: linear-gradient(90deg, #3B82F6, #6366F1);"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if product.carbs %}
+        <div class="nutr-row">
+          <span class="nutr-label">🌾 Carbohydrates</span>
+          <div style="text-align:right; width:55%;">
+            <span class="nutr-val">{{ product.carbs }}g</span>
+            <div class="nutr-bar-bg" style="margin-top:4px;">
+              <div class="nutr-bar-fill carbs" style="width:{{ [product.carbs, 100]|min }}%; background: linear-gradient(90deg, #10B981, #84CC16);"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if product.sugars %}
+        <div class="nutr-row">
+          <span class="nutr-label">🍬 Of which Sugars</span>
+          <div style="text-align:right; width:55%;">
+            <span class="nutr-val" style="{% if product.sugars > 30 %}color:#EF4444{% elif product.sugars > 20 %}color:#F59E0B{% else %}color:#10B981{% endif %};">{{ product.sugars }}g</span>
+            <div class="nutr-bar-bg" style="margin-top:4px;">
+              <div class="nutr-bar-fill" style="width:{{ [product.sugars * 2, 100]|min }}%; background: linear-gradient(90deg, #EC4899, #F43F5E);"></div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <p style="color: var(--text-muted); font-size:0.875rem;">Nutritional information not available for this product.</p>
+      {% endif %}
+    </div>
+
+    <!-- INGREDIENT FLAGS -->
+    <div class="detail-card">
+      <div class="detail-card-title">🏷️ Ingredient Flags</div>
+      <div class="flag-grid">
+        <div class="flag-item {% if not product.trans_fat %}flag-ok{% else %}flag-bad{% endif %}">
+          <span class="flag-icon">{% if not product.trans_fat %}✅{% else %}❌{% endif %}</span>
+          <span>Trans Fat {% if not product.trans_fat %}Free{% else %}Present{% endif %}</span>
+        </div>
+        <div class="flag-item {% if not product.artificial_colors %}flag-ok{% else %}flag-warn{% endif %}">
+          <span class="flag-icon">{% if not product.artificial_colors %}✅{% else %}⚠️{% endif %}</span>
+          <span>Artificial Colors {% if not product.artificial_colors %}Free{% else %}Present{% endif %}</span>
+        </div>
+        <div class="flag-item {% if not product.preservatives %}flag-ok{% else %}flag-warn{% endif %}">
+          <span class="flag-icon">{% if not product.preservatives %}✅{% else %}⚠️{% endif %}</span>
+          <span>Preservatives {% if not product.preservatives %}Free{% else %}Present{% endif %}</span>
+        </div>
+        <div class="flag-item {% if not product.artificial_flavours %}flag-ok{% else %}flag-warn{% endif %}">
+          <span class="flag-icon">{% if not product.artificial_flavours %}✅{% else %}⚠️{% endif %}</span>
+          <span>Artif. Flavours {% if not product.artificial_flavours %}Free{% else %}Present{% endif %}</span>
+        </div>
+        <div class="flag-item {% if not product.added_sugar %}flag-ok{% else %}flag-warn{% endif %}">
+          <span class="flag-icon">{% if not product.added_sugar %}✅{% else %}⚠️{% endif %}</span>
+          <span>Added Sugar {% if not product.added_sugar %}Free{% else %}Present{% endif %}</span>
+        </div>
+        <div class="flag-item {% if not product.added_salt %}flag-ok{% else %}flag-warn{% endif %}">
+          <span class="flag-icon">{% if not product.added_salt %}✅{% else %}⚠️{% endif %}</span>
+          <span>Added Salt {% if not product.added_salt %}Free{% else %}Present{% endif %}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INGREDIENTS TEXT -->
+    {% if product.ingredients %}
+    <div class="detail-card">
+      <div class="detail-card-title">📋 Ingredients</div>
+      <div class="ingredients-text">{{ product.ingredients }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div>
+    <!-- CONCERNS & POSITIVES -->
+    {% if product.concerns %}
+    <div class="detail-card">
+      <div class="detail-card-title">⚠️ Concerns</div>
+      <div class="tag-list">
+        {% for c in product.concerns %}
+        <span class="concern-tag-full">⚠ {{ c }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if product.badges %}
+    <div class="detail-card">
+      <div class="detail-card-title">✨ Certifications & Positives</div>
+      <div class="tag-list">
+        {% for b in product.badges %}
+        <span class="badge badge-{{ b.color }}" style="font-size:0.8rem; padding:0.35rem 0.75rem;">{{ b.label }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ORIGIN & SUSTAINABILITY -->
+    <div class="detail-card">
+      <div class="detail-card-title">🌍 Origin & Sustainability</div>
+      {% if product.origin_country %}
+      <div class="origin-item">
+        <span class="origin-icon">🗺️</span>
+        <span><strong>Origin:</strong> {{ product.origin_country }}</span>
+      </div>
+      {% endif %}
+      {% if product.manufacturing_place %}
+      <div class="origin-item">
+        <span class="origin-icon">🏭</span>
+        <span><strong>Made in:</strong> {{ product.manufacturing_place }}</span>
+      </div>
+      {% endif %}
+      <div class="origin-item">
+        <span class="origin-icon">♻️</span>
+        <span><strong>Eco Score:</strong> {{ product.eco_score_raw }}/100</span>
+      </div>
+      {% if product.vegan %}<div class="origin-item"><span class="origin-icon">🌱</span><span>Vegan certified</span></div>{% endif %}
+      {% if product.cruelty_free %}<div class="origin-item"><span class="origin-icon">💚</span><span>Cruelty-free</span></div>{% endif %}
+    </div>
+
+    <!-- SCORE EXPLANATION -->
+    <div class="detail-card">
+      <div class="detail-card-title">📈 Score Breakdown</div>
+      <p style="font-size:0.82rem; color: var(--text-muted); margin-bottom:1rem; line-height:1.6;">
+        Health Score is computed from nutritional quality, ingredient processing, and additives. <strong>Higher = Better</strong> (75 is poor, 170 is ideal).
+      </p>
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; color: var(--text-muted); margin-bottom:4px;">
+        <span>F (Worst)</span><span>A (Best)</span>
+      </div>
+      <div style="background:linear-gradient(90deg, #DCFCE7, #FEF3C7, #FEE2E2); height:10px; border-radius:5px; position:relative;">
+        <div style="
+          position:absolute; top:-4px;
+          left:{{ [((product.health_score_raw - 75) / (170 - 75)) * 100, 97]|min }}%;
+          transform:translateX(-50%);
+          width:18px; height:18px; background: var(--forest);
+          border-radius:50%; border:3px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        "></div>
+      </div>
+      <div style="text-align:center; margin-top:0.75rem;">
+        <span style="font-family: 'Playfair Display', serif; font-size:1.5rem; font-weight:700; color: var(--forest);">{{ product.health_score_raw }}</span>
+        <span style="font-size:0.8rem; color: var(--text-muted);"> / 170</span>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+      <a href="/recommend?brand={{ product.brand }}" class="btn btn-outline" style="justify-content:center;">
+        More by {{ product.brand }}
+      </a>
+      <a href="/compare?ids={{ product.id }}" class="btn btn-primary" style="justify-content:center;">
+        Compare This Product
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- SIMILAR PRODUCTS -->
+{% if similar %}
+<div style="max-width:1100px; margin:0 auto; padding:0 2rem 3rem;">
+  <h2 style="font-family: 'Playfair Display', serif; font-size:1.5rem; color: var(--forest); margin-bottom:0.25rem;">Similar Products</h2>
+  <p style="font-size:0.8rem; color: var(--text-muted); margin-bottom:1rem;">🤖 Ranked by cosine similarity across nutrition + ingredient features</p>
+  <div class="similar-grid" style="grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));">
+    {% for s in similar %}
+    <a href="/product/{{ s.id }}" class="similar-card">
+      <div class="similar-brand">{{ s.brand }}</div>
+      <div class="similar-name">{{ s.name[:40] }}{% if s.name|length > 40 %}...{% endif %}</div>
+      <div class="similar-grade-row">
+        <div class="grade grade-{{ s.health_grade }}" style="width:28px;height:28px;font-size:0.7rem;">{{ s.health_grade }}</div>
+        <div class="grade grade-{{ s.eco_grade }}" style="width:28px;height:28px;font-size:0.7rem;">{{ s.eco_grade }}</div>
+      </div>
+      {% if s.similarity is defined %}
+      <div style="margin-top:0.4rem;">
+        <div style="display:flex;justify-content:space-between;font-size:0.65rem;color: var(--text-muted);margin-bottom:2px;">
+          <span>Match</span><span style="color:#6366F1;font-weight:700;">{{ s.similarity }}%</span>
+        </div>
+        <div style="background:var(--border);border-radius:3px;height:4px;overflow:hidden;">
+          <div style="width:{{ s.similarity }}%;height:100%;background:linear-gradient(90deg,#6366F1,#a5b4fc);border-radius:3px;"></div>
+        </div>
+      </div>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

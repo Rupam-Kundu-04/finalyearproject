@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}About — GreenPath{% endblock %}
+
+{% block content %}
+<div style="background:linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%); padding:4rem 2rem; color:white; text-align:center;">
+  <h1 style="font-family: 'Playfair Display', serif; font-size:2.5rem; font-weight:700; margin-bottom:1rem;">About GreenPath</h1>
+  <p style="color:rgba(255,255,255,0.75); max-width:600px; margin:0 auto; font-size:1.1rem;">
+    A data-driven project to help consumers make healthier, more informed snacking decisions.
+  </p>
+</div>
+
+<div style="max-width:800px; margin:0 auto; padding:3rem 2rem;">
+
+  <div style="background:white; border-radius:16px; border:1px solid var(--border); padding:2rem; margin-bottom:1.5rem;">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:1rem;">🎓 About This Project</h2>
+    <p style="color: var(--text-muted); line-height:1.8; margin-bottom:1rem;">
+      GreenPath is a recommendation platform that analyze products available in the Indian market across multiple dimensions — health, sustainability, and ingredient transparency.
+    </p>
+    <p style="color: var(--text-muted); line-height:1.8;">
+      We analyzed <strong>462 products</strong> from over <strong>80 brands</strong>, extracting nutritional data, ingredient lists, certifications, and sustainability indicators to create meaningful health and eco scores.
+    </p>
+  </div>
+
+  <div style="background:white; border-radius:16px; border:1px solid var(--border); padding:2rem; margin-bottom:1.5rem;">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:1rem;">📊 How We Score Products</h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1rem;">
+      <div style="background: var(--dew); border-radius:12px; padding:1.25rem;">
+        <h3 style="font-size:1rem; font-weight:700; color: var(--forest); margin-bottom:0.5rem;">💚 Health Score</h3>
+        <p style="font-size:0.85rem; color: var(--text-muted); line-height:1.6;">
+          Computed by penalizing products for: refined grains, palm oil content, artificial additives, high sugar/salt, preservatives, trans fats, and artificial colors. <strong>Higher score = healthier product.</strong> Grades range from E (75–90) to A (151+).
+        </p>
+      </div>
+      <div style="background: var(--dew); border-radius:12px; padding:1.25rem;">
+        <h3 style="font-size:1rem; font-weight:700; color: var(--forest); margin-bottom:0.5rem;">🌿 Eco Score</h3>
+        <p style="font-size:0.85rem; color: var(--text-muted); line-height:1.6;">
+          Based on packaging recyclability, eco-labels, reusable packaging, organic certifications, vegan status, and local manufacturing. <strong>Higher score = more sustainable.</strong>
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top:1.25rem; padding:1rem; background: var(--dew); border-radius:10px;">
+      <h4 style="font-size:0.9rem; font-weight:700; color: var(--forest); margin-bottom:0.5rem;">Grade Scale (Health Score)</h4>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <span class="grade grade-A" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family: 'Playfair Display', serif;font-weight:700;border-radius:50%;background:#DCFCE7;color:#166534;">A</span>
+        <span class="grade grade-B" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family: 'Playfair Display', serif;font-weight:700;border-radius:50%;background:#D1FAE5;color:#065F46;">B</span>
+        <span class="grade grade-C" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family: 'Playfair Display', serif;font-weight:700;border-radius:50%;background:#FEF9C3;color:#92400E;">C</span>
+        <span class="grade grade-D" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family: 'Playfair Display', serif;font-weight:700;border-radius:50%;background:#FED7AA;color:#9A3412;">D</span>
+        <span class="grade grade-F" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;font-family: 'Playfair Display', serif;font-weight:700;border-radius:50%;background:#FEE2E2;color:#991B1B;">E</span>
+        <div style="font-size:0.8rem; color: var(--text-muted); display:flex; align-items:center; gap:0.25rem; flex-wrap:wrap;">
+          <span>E = score 75–90 (Worst)</span> •
+          <span>D = 91–110</span> •
+          <span>C = 111–130</span> •
+          <span>B = 131–150</span> •
+          <span>A = 151+ (Best)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:white; border-radius:16px; border:1px solid var(--border); padding:2rem; margin-bottom:1.5rem;">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:1rem;">🔍 Features</h2>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:0.75rem;">
+      <li style="display:flex; gap:0.75rem; font-size:0.9rem; color: var(--text-muted);">
+        <span>🍪</span><span><strong style="color:var(--text);">Smart Recommendations</strong> — Filter by dietary needs, avoid specific ingredients, sort by any metric.</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; font-size:0.9rem; color: var(--text-muted);">
+        <span>⚖️</span><span><strong style="color:var(--text);">Side-by-Side Comparison</strong> — Compare up to 4 products across all nutritional and additive dimensions.</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; font-size:0.9rem; color: var(--text-muted);">
+        <span>📊</span><span><strong style="color:var(--text);">Detailed Product Pages</strong> — Full ingredient lists, nutrition bars, flag analysis, and similar product suggestions.</span>
+      </li>
+      <li style="display:flex; gap:0.75rem; font-size:0.9rem; color: var(--text-muted);">
+        <span>🔍</span><span><strong style="color:var(--text);">Instant Search</strong> — Find any product or brand instantly from the homepage or explore page.</span>
+      </li>
+    </ul>
+  </div>
+
+  <div style="text-align:center; margin-top:2rem;">
+    <a href="/recommend" class="btn btn-primary" style="padding:0.875rem 2.5rem; font-size:1rem;">Start Exploring</a>
+  </div>
+</div>
+{% endblock %}
+//deploy fix
