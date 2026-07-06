@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Compare Biscuits — GreenPath{% endblock %}
+{% block title %}Compare Products — GreenPath{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -57,37 +57,78 @@
   }
   .remove-btn:hover { color: var(--lime-dark); }
 
-  /* COMPARISON TABLE */
-  .compare-table-wrap { overflow-x: auto; margin-top: 1rem; }
+  /* COMPARISON TABLE - STRUCTURAL GRID LOCKS */
+  .compare-table-wrap { 
+    overflow-x: auto; 
+    margin-top: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
   .compare-table {
     width: 100%; border-collapse: separate; border-spacing: 0;
+    table-layout: fixed;
   }
   .compare-table th, .compare-table td {
-    padding: 0.9rem 1.25rem; text-align: center;
+    padding: 1rem 1.25rem; 
+    text-align: center;
     border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     font-size: 0.875rem;
+    vertical-align: top;
+  }
+  .compare-table th:last-child, .compare-table td:last-child {
+    border-right: none;
   }
   .compare-table th {
     background: var(--dew);
     font-weight: 700; font-family: 'Playfair Display', serif; font-size: 0.95rem;
-    color: var(--forest); position: sticky; top: 64px; z-index: 10;
+    color: var(--forest); position: sticky; top: 0; z-index: 10;
+    box-shadow: inset 0 -2px 0 var(--border);
   }
-  .compare-table th:first-child { text-align: left; }
-  .compare-table td:first-child {
-    text-align: left; font-weight: 600; color: var(--text-muted);
-    background: var(--snow); font-size: 0.8rem;
+  
+  .compare-table th:first-child, .compare-table td:first-child {
+    text-align: left; 
+    font-weight: 600; 
+    color: var(--text-muted);
+    background: var(--snow); 
+    font-size: 0.8rem;
+    width: 180px;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    border-right: 2px solid var(--border);
   }
+  
+  .compare-table th:first-child {
+    z-index: 15;
+    background: var(--dew);
+  }
+
+  .header-text-limiter {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.5rem;
+    line-height: 1.25rem;
+  }
+
   .compare-table tr:hover td { background: var(--dew); }
   .compare-table tr:hover td:first-child { background: #f0e8d8; }
+  
   .best-cell { background: #DCFCE7 !important; color: #166534; font-weight: 700; }
   .worst-cell { background: #FEE2E2 !important; color: #991B1B; }
+  
   .section-row td {
     background: var(--forest) !important; color: white !important;
     font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-    font-size: 0.7rem; padding: 0.5rem 1.25rem;
+    font-size: 0.7rem; padding: 0.6rem 1.25rem;
+    text-align: left !important;
   }
-  .yes-cell { color: #166534; font-size: 1.1rem; }
-  .no-cell { color: #991B1B; font-size: 1.1rem; }
+  .yes-cell { color: #166534; font-size: 1.1rem; font-weight: bold; }
+  .no-cell { color: #991B1B; font-size: 1.1rem; font-weight: bold; }
 
   .empty-compare {
     text-align: center; padding: 4rem 2rem;
@@ -109,7 +150,6 @@
 <div class="compare-container">
 
   {% if products %}
-  <!-- COMPARISON TABLE -->
   <div class="compare-table-wrap">
     <table class="compare-table">
       <thead>
@@ -117,24 +157,23 @@
           <th>Attribute</th>
           {% for p in products %}
           <th>
-            <div style="font-size:0.7rem; color: var(--moss); text-transform:uppercase; font-family: 'Plus Jakarta Sans', sans-serif; font-weight:700;">{{ p.brand }}</div>
-            <div style="font-size:0.9rem;">{{ p.name[:30] }}{% if p.name|length > 30 %}…{% endif %}</div>
+            <div style="font-size:0.7rem; color: var(--moss); text-transform:uppercase; font-family: 'Plus Jakarta Sans', sans-serif; font-weight:700; tracking-wide; margin-bottom: 0.25rem;">{{ p.brand }}</div>
+            <div class="header-text-limiter" title="{{ p.name }}">{{ p.name }}</div>
             <div style="margin-top:0.5rem; display:flex; gap:0.4rem; justify-content:center;">
-              <a href="/product/{{ p.id }}" style="font-size:0.7rem; color: var(--moss);">Details →</a>
+              <a href="/product/{{ p.id }}" style="font-size:0.75rem; color: var(--moss); font-weight: bold; text-decoration: underline;">Details →</a>
             </div>
           </th>
           {% endfor %}
         </tr>
       </thead>
       <tbody>
-        <!-- SCORES -->
-        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Scores (Lower Health = Better)</td></tr>
+        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Scores (Higher Health = Better)</td></tr>
         <tr>
           <td>Health Score</td>
-          {% set min_h = products|map(attribute='health_score_raw')|select('gt', 0)|min %}
+          {% set min_h = products|map(attribute='health_score_raw')|min %}
           {% set max_h = products|map(attribute='health_score_raw')|max %}
           {% for p in products %}
-          <td {% if p.health_score_raw == min_h and min_h > 0 %}class="best-cell"{% elif p.health_score_raw == max_h %}class="worst-cell"{% endif %}>
+          <td {% if p.health_score_raw == max_h and max_h > 0 %}class="best-cell"{% elif p.health_score_raw == min_h and products|length > 1 %}class="worst-cell"{% endif %}>
             {{ p.health_score_raw if p.health_score_raw else 'N/A' }}
           </td>
           {% endfor %}
@@ -142,7 +181,7 @@
         <tr>
           <td>Health Grade</td>
           {% for p in products %}
-          <td><span class="grade grade-{{ p.health_grade }}">{{ p.health_grade }}</span></td>
+          <td><span class="grade grade-{{ p.health_grade }}" style="font-weight: bold; font-size: 1rem;">{{ p.health_grade }}</span></td>
           {% endfor %}
         </tr>
         <tr>
@@ -150,45 +189,12 @@
           {% set max_e = products|map(attribute='eco_score_raw')|max %}
           {% set min_e = products|map(attribute='eco_score_raw')|min %}
           {% for p in products %}
-          <td {% if p.eco_score_raw == max_e %}class="best-cell"{% elif p.eco_score_raw == min_e and products|length > 1 %}class="worst-cell"{% endif %}>
+          <td {% if p.eco_score_raw == max_e and max_e > 0 %}class="best-cell"{% elif p.eco_score_raw == min_e and products|length > 1 %}class="worst-cell"{% endif %}>
             {{ p.eco_score_raw if p.eco_score_raw else 'N/A' }}
           </td>
           {% endfor %}
         </tr>
 
-        <!-- NUTRITION -->
-        <tr class="section-row"><td colspan="{{ products|length + 1 }}">Nutrition (per 100g)</td></tr>
-        <tr>
-          <td>Energy (kcal)</td>
-          {% for p in products %}<td>{{ p.energy|int if p.energy else '—' }}</td>{% endfor %}
-        </tr>
-        <tr>
-          <td>Fat (g)</td>
-          {% set min_f = products|map(attribute='fat')|min %}
-          {% for p in products %}
-          <td {% if p.fat == min_f and min_f > 0 %}class="best-cell"{% endif %}>{{ p.fat if p.fat else '—' }}</td>
-          {% endfor %}
-        </tr>
-        <tr>
-          <td>Protein (g)</td>
-          {% set max_p = products|map(attribute='protein')|max %}
-          {% for p in products %}
-          <td {% if p.protein == max_p and max_p > 0 %}class="best-cell"{% endif %}>{{ p.protein if p.protein else '—' }}</td>
-          {% endfor %}
-        </tr>
-        <tr>
-          <td>Carbs (g)</td>
-          {% for p in products %}<td>{{ p.carbs if p.carbs else '—' }}</td>{% endfor %}
-        </tr>
-        <tr>
-          <td>Sugars (g)</td>
-          {% set min_s = products|map(attribute='sugars')|min %}
-          {% for p in products %}
-          <td {% if p.sugars == min_s and min_s >= 0 and products|length > 1 %}class="best-cell"{% endif %}>{{ p.sugars if p.sugars else '—' }}</td>
-          {% endfor %}
-        </tr>
-
-        <!-- ADDITIVES -->
         <tr class="section-row"><td colspan="{{ products|length + 1 }}">Additives & Ingredients</td></tr>
         <tr>
           <td>Added Sugar</td>
@@ -215,7 +221,6 @@
           {% for p in products %}<td class="{% if not p.trans_fat %}yes-cell{% else %}no-cell{% endif %}">{% if not p.trans_fat %}✅{% else %}❌{% endif %}</td>{% endfor %}
         </tr>
 
-        <!-- DIETARY -->
         <tr class="section-row"><td colspan="{{ products|length + 1 }}">Dietary Attributes</td></tr>
         <tr>
           <td>Vegan</td>
@@ -231,7 +236,7 @@
         </tr>
         <tr>
           <td>Origin</td>
-          {% for p in products %}<td>{{ p.origin_country or '—' }}</td>{% endfor %}
+          {% for p in products %}<td style="font-size: 0.8rem; font-weight: 500;">{{ p.origin_country or '—' }}</td>{% endfor %}
         </tr>
       </tbody>
     </table>
@@ -252,7 +257,6 @@
     <a href="/recommend" class="btn btn-primary">Explore Products</a>
   </div>
 
-  <!-- Quick search compare -->
   <div style="max-width:600px; margin:2rem auto; background:white; border-radius:16px; border:1px solid var(--border); padding:2rem;">
     <h3 style="font-family: 'Playfair Display', serif; color: var(--forest); margin-bottom:1rem;">Or search directly:</h3>
     <div style="position:relative;">
