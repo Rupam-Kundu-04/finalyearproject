@@ -125,7 +125,7 @@
     color: var(--forest); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .product-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
-  .grades-row { display: flex; gap: 0.5rem; flex-shrink: 0; }
+  .grades-row { display: flex; gap: 0.5rem; flex-shrink: 0; align-items: center; }
   .grade-item { text-align: center; }
   .grade-item-lbl { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
   .nutr-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -136,6 +136,13 @@
   .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.75rem; border-top: 1px solid var(--mist); }
   .product-link { font-size: 0.84rem; font-weight: 600; color: var(--forest-light); text-decoration: none; }
   .product-link:hover { color: var(--lime-dark); }
+
+  /* Favorite Toggle Button Sizing Rules */
+  .favorite-toggle-btn {
+    background: none; border: none; font-size: 1.4rem; cursor: pointer; outline: none;
+    padding: 0; line-height: 1; transition: transform 0.1s; user-select: none;
+  }
+  .favorite-toggle-btn:hover { transform: scale(1.15); }
 
   /* browse */
   .browse-section { background: var(--forest); }
@@ -153,7 +160,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- HERO -->
 <div class="hero">
   <span class="hero-leaf hero-leaf-1">🌿</span>
   <span class="hero-leaf hero-leaf-2">🍃</span>
@@ -181,7 +187,6 @@
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
 <div class="section how-section">
   <div class="container">
     <div style="text-align:center;">
@@ -197,7 +202,6 @@
   </div>
 </div>
 
-<!-- TOP PICKS -->
 <div class="section">
   <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:1rem; margin-bottom:0.5rem;">
@@ -212,7 +216,16 @@
             <div class="product-brand">{{ p.brand }}</div>
             <div class="product-name" title="{{ p.name }}">{{ p.name }}</div>
           </div>
+          
           <div class="grades-row">
+            
+            {% if session.get('user_email') %}
+            <button class="favorite-toggle-btn" 
+                    onclick="toggleProductFavorite('{{ p.id }}', this)"
+                    title="Toggle Favorite Box">
+                {% if p.is_favorite %}⭐{% else %}☆{% endif %}
+            </button>
+            {% endif %}
             <div class="grade-item"><div class="grade grade-{{ p.health_grade }}">{{ p.health_grade }}</div><div class="grade-item-lbl">Health</div></div>
             <div class="grade-item"><div class="grade grade-{{ p.eco_grade }}">{{ p.eco_grade }}</div><div class="grade-item-lbl">Eco</div></div>
           </div>
@@ -233,7 +246,6 @@
   </div>
 </div>
 
-<!-- BROWSE -->
 <div class="section browse-section">
   <div class="container">
     <div style="text-align:center;">
@@ -271,5 +283,46 @@
   });
   document.addEventListener('click', e => { if (!input.contains(e.target)) results.style.display='none'; });
   input.addEventListener('keydown', e => { if (e.key==='Enter' && input.value.trim()) window.location.href=`/recommend?query=${encodeURIComponent(input.value.trim())}`; });
+
+  // ─── ASYNCHRONOUS FAVORITES TOGGLE HANDLER ───
+  function toggleProductFavorite(productId, buttonElement) {
+    console.log("Toggling Product ID:", productId);
+    
+    fetch('/toggle-favorite/' + encodeURIComponent(productId), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        // CRITICAL FIX: Sending a valid JSON body stops Flask from crashing with an empty payload error
+        body: JSON.stringify({ "productId": productId })
+    })
+    .then(response => {
+        if (response.status === 401) {
+            alert("Please sign in to save products to your dashboard favorites.");
+            window.location.href = '/signin';
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error("Server returned error status: " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data) return;
+        
+        if (data.status === 'success') {
+            if (data.action === 'added') {
+                buttonElement.innerText = '⭐';
+                buttonElement.style.color = '#eab308'; // Turns the star bright yellow
+            } else if (data.action === 'removed') {
+                buttonElement.innerText = '☆';
+                buttonElement.style.color = ''; // Resets back to hollow theme style
+            }
+        }
+    })
+    .catch(error => {
+        console.error("Favorite toggle failure error trace:", error);
+    });
+}
 </script>
 {% endblock %}

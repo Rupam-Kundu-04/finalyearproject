@@ -164,7 +164,7 @@
 {% block content %}
 <div class="page-header">
   <div style="max-width:1200px; margin:0 auto; padding:0 2rem;">
-    <h1>🍪 Explore Biscuits</h1>
+    <h1>🍪 Explore Products</h1>
     <p>{{ total }} results — use filters to find your perfect match</p>
   </div>
 </div>
@@ -274,6 +274,11 @@
           <div>
             <div class="product-brand">{{ p.brand }}</div>
             <div class="product-name">{{ p.name }}</div>
+            {% if session.get('user_email') %}
+            <button onclick="toggleProductFavorite('{{ p.id }}', this)" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; outline: none; padding: 0;">
+            {% if p.is_favorite %}⭐{% else %}☆{% endif %}
+            </button>
+    {% endif %}
           </div>
           <div class="grade-pair">
             <div class="grade-mini">
@@ -377,5 +382,19 @@
   function clearFilters() {
     window.location.href = '/recommend';
   }
+  function toggleProductFavorite(productId, buttonElement) {
+    fetch('/toggle-favorite/' + encodeURIComponent(productId), { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            if (data.action === 'added') {
+                buttonElement.innerText = '⭐';
+            } else if (data.action === 'removed') {
+                buttonElement.innerText = '☆';
+            }
+        }
+    })
+    .catch(error => console.error("Error toggling favorite:", error));
+}
 </script>
 {% endblock %}

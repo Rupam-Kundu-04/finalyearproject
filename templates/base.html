@@ -166,7 +166,15 @@
         <a href="/compare"     {% if request.endpoint == 'compare'        %}class="active"{% endif %}>Compare</a>
         <a href="/ml-recommend" {% if request.endpoint == 'ml_recommend'  %}class="active nav-smart"{% else %}class="nav-smart"{% endif %}>🤖 Smart Pick</a>
         <a href="/about"       {% if request.endpoint == 'about'          %}class="active"{% endif %}>About</a>
-      </div>
+
+        {% if session.get('user_email') %}
+          <a href="/dashboard" {% if request.endpoint == 'dashboard' %}class="active"{% endif %} style="font-weight: 700; color: #2e7d32;">📋 Dashboard</a>
+          <a href="/logout" style="color: #c62828; font-weight: 500;">Sign Out</a>
+        {% else %}
+          <a href="/signin" {% if request.endpoint == 'signin' %}class="active"{% endif %}>Sign In</a>
+          <a href="/signup" {% if request.endpoint == 'signup' %}class="active"{% endif %} style="font-weight: 700; color: #2e7d32;">Sign Up</a>
+        {% endif %}
+        </div>
     </div>
   </nav>
   <main>{% block content %}{% endblock %}</main>

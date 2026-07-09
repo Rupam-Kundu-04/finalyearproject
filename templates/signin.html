@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Sign In — GreenPath{% endblock %}
+{% block content %}
+<div style="max-width: 450px; margin: 4rem auto; padding: 2.5rem; bg: white; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg);">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; text-align: center;">Welcome Back</h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 2rem;">Sign in to access your dashboard and saved products.</p>
+    
+    {% if error %}
+    <div style="background: #fee2e2; color: #991b1b; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 600;">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; uppercase; color: var(--forest); margin-bottom: 0.4rem; tracking: 0.05em;">Email Address</label>
+            <input type="email" name="email" required placeholder="you@example.com" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none;">
+        </div>
+        <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; uppercase; color: var(--forest); margin-bottom: 0.4rem; tracking: 0.05em;">Password</label>
+            <input type="password" name="password" required placeholder="••••••••" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-weight: 700; border-radius: 8px;">Sign In</button>
+    </form>
+    
+    <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem;">New to GreenPath? <a href="/signup" style="color: var(--moss); font-weight: 700; text-decoration: underline;">Create an account</a></p>
+</div>
+{% endblock %}

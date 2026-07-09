@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}User Dashboard — GreenPath{% endblock %}
+{% block content %}
+<div style="background: var(--snow); padding: 3rem 2rem; border-bottom: 1px solid var(--border);">
+    <div style="max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 2.25rem; font-weight: 700; color: var(--forest);">Hello, {{ name }}! 👋</h1>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">Welcome to your personalized nutrition overview dashboard.</p>
+        </div>
+        <a href="/logout" class="btn btn-outline" style="border-color: #991b1b; color: #991b1b;">Sign Out</a>
+    </div>
+</div>
+
+<div style="max-width: 1100px; margin: 2rem auto; padding: 0 2rem;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--forest); margin-bottom: 1.5rem; font-weight: 700;">❤️ Your Favorited Products</h2>
+
+    {% if products %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        {% for p in products %}
+        <div style="background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; position: relative;">
+            <div>
+                <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--moss); tracking: 0.05em;">{{ p.brand }}</span>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--forest); margin: 0.25rem 0 0.75rem 0;">{{ p.name }}</h3>
+                
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <span class="badge" style="background: #e2e8f0; color: #4a5568; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px;">Health Score: {{ p.health_score_raw }}</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+                <a href="/product/{{ p.id }}" class="btn btn-primary" style="flex: 1; text-align: center; font-size: 0.8rem; padding: 0.5rem; border-radius: 6px;">View Details</a>
+                <button onclick="removeFavorite('{{ p.id }}', this)" style="background: #fee2e2; border: none; color: #991b1b; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold;" title="Remove from favorites">🗑️</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border: 1px solid var(--border); border-radius: 12px; max-width: 500px; margin: 0 auto;">
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">You haven't favorited any products yet.</p>
+        <a href="/" class="btn btn-primary" style="padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;">Browse Main Catalog</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function removeFavorite(productId, button) {
+    fetch('/toggle-favorite/' + productId, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            // Smoothly reload the user dashboard view
+            window.location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
