@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-BiscuitIQ — Biscuit Recommendation Website
+GreenPath — Product Recommendation Website
 Run this file to start the web server.
 """
 import subprocess

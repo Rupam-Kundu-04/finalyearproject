@@ -3,5 +3,10 @@
     "name": "Rupam Kundu",
     "password": "scrypt:32768:8:1$OQX170sfyebow8Wy$17b63ea5b9150c5d03d4c8a30eff58c4c1fbe2f842a99106a5e99342dc6cbc532086b0b1accd9437eb867d7a7b4d432bffbc35b94c2f64c9863227919f8365d0",
     "favorites": []
+  },
+  "abc@gmail.com": {
+    "name": "abc",
+    "password": "scrypt:32768:8:1$PUBqVFs1bGksrXH4$6d349b85f1a9e66df33a154a2fa41e7aeb6375a0f9e5852859b099e1704267dda904fd668a9c890f98913618db5f741604e32a6dba109c817fc4289ce5066c1f",
+    "favorites": []
   }
 }

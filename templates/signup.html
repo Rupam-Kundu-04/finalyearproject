@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Sign Up — GreenPath{% endblock %}
 {% block content %}
-<div style="max-width: 450px; margin: 4rem auto; padding: 2.5rem; bg: white; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg);">
+<div style="max-width: 450px; margin: 4rem auto; padding: 2.5rem; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg);">
     <h2 style="font-family: 'Playfair Display', serif; color: var(--forest); font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; text-align: center;">Create Account</h2>
     <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 2rem;">Join GreenPath to save your favorite alternative food products.</p>
     
@@ -11,20 +11,47 @@
 
     <form method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
         <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; uppercase; color: var(--forest); margin-bottom: 0.4rem; tracking: 0.05em;">Full Name</label>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--forest); margin-bottom: 0.4rem; letter-spacing: 0.05em;">Full Name</label>
             <input type="text" name="name" required placeholder="John Doe" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.15s;" onfocus="this.style.borderColor='var(--moss)'" onblur="this.style.borderColor='var(--border)'">
         </div>
         <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; uppercase; color: var(--forest); margin-bottom: 0.4rem; tracking: 0.05em;">Email Address</label>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--forest); margin-bottom: 0.4rem; letter-spacing: 0.05em;">Email Address</label>
             <input type="email" name="email" required placeholder="you@example.com" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.15s;" onfocus="this.style.borderColor='var(--moss)'" onblur="this.style.borderColor='var(--border)'">
         </div>
+        
         <div>
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; uppercase; color: var(--forest); margin-bottom: 0.4rem; tracking: 0.05em;">Password</label>
-            <input type="password" name="password" required placeholder="••••••••" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.15s;" onfocus="this.style.borderColor='var(--moss)'" onblur="this.style.borderColor='var(--border)'">
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--forest); margin-bottom: 0.4rem; letter-spacing: 0.05em;">Password</label>
+            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                <input type="password" name="password" id="userSignupPasswordField" required placeholder="••••••••" style="width: 100%; padding: 0.75rem 2.75rem 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: border-color 0.15s;" onfocus="this.style.borderColor='var(--moss)'" onblur="this.style.borderColor='var(--border)'">
+                <button type="button" id="passwordToggleBtn" onclick="toggleSignupPasswordVisibility()" style="position: absolute; right: 0.85rem; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--text-muted); outline: none; padding: 0; user-select: none; display: flex; align-items: center; justify-content: center;">
+                    👁️
+                </button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-weight: 700; border-radius: 8px; margin-top: 0.5rem;">Sign Up</button>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-weight: 700; border-radius: 8px; margin-top: 0.5rem; cursor: pointer;">Sign Up</button>
     </form>
     
     <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 1.5rem;">Already have an account? <a href="/signin" style="color: var(--moss); font-weight: 700; text-decoration: underline;">Sign In here</a></p>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleSignupPasswordVisibility() {
+    const passwordField = document.getElementById('userSignupPasswordField');
+    const toggleBtn = document.getElementById('passwordToggleBtn');
+    
+    if (passwordField && toggleBtn) {
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleBtn.innerHTML = '🙈';
+            toggleBtn.setAttribute('title', 'Hide Password');
+        } else {
+            passwordField.type = 'password';
+            toggleBtn.innerHTML = '👁️';
+            toggleBtn.setAttribute('title', 'Show Password');
+        }
+    }
+}
+</script>
 {% endblock %}

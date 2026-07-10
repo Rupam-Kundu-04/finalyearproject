@@ -147,7 +147,20 @@
           {% for b in product.badges %}
           <span class="badge badge-{{ b.color }}" style="font-size:0.8rem;">{{ b.label }}</span>
           {% endfor %}
-        </div>
+        </div> 
+    <!-- <div class="product-category-wrapper" style="margin: 0.5rem 0 1.25rem 0; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+        Category:
+    </span>
+    <span style="display: inline-block; background: var(--dew); color: var(--forest-mid); font-size: 0.85rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); margin-left: 0.4rem; text-transform: capitalize;">
+        {{ product.product_category }}
+    </span>
+    {% for b in product.badges %}
+          {% if b.label.lower() != product.product_category.lower() %}
+          <span class="badge badge-{{ b.color }}" style="font-size:0.8rem;">{{ b.label }}</span>
+          {% endif %}
+          {% endfor %}
+    </div> -->
       </div>
       <div class="product-hero-right">
         <div class="hero-score-block">
