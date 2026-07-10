@@ -1,5 +1,5 @@
 """
-BiscuitIQ — ML Recommendation Engine
+Greenpath — ML Recommendation Engine
 Algorithm: Content-Based Filtering using Cosine Similarity
 """
 
