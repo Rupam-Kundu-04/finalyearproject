@@ -1,5 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ product.name }} — GreenPath{% endblock %}
+{% block title %}
+  {% if product and product.name %}
+    {{ product.name }} — GreenPath
+  {% else %}
+    Product Details — GreenPath
+  {% endif %}
+{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -72,18 +78,15 @@
     padding-bottom: 0.75rem; border-bottom: 2px solid var(--dew);
   }
 
-  /* NUTRITION TABLE */
+  /* NUTRITION LAYOUT MECHANICS */
   .nutr-table { width: 100%; }
   .nutr-row {
     display: flex; justify-content: space-between; align-items: center;
     padding: 0.6rem 0; border-bottom: 1px solid var(--dew);
   }
   .nutr-row:last-child { border-bottom: none; }
-  .nutr-label { font-size: 0.875rem; color: var(--text-muted); }
-  .nutr-val { font-weight: 700; font-size: 0.9rem; }
-  .nutr-bar-full { margin-top: 0.3rem; }
-  .nutr-bar-bg { background: var(--dew); border-radius: 4px; height: 7px; overflow: hidden; }
-  .nutr-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .nutr-label { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; text-transform: capitalize; }
+  .nutr-val { font-weight: 700; font-size: 0.9rem; color: var(--forest-light); }
 
   /* INGREDIENT FLAGS */
   .flag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
@@ -133,7 +136,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- HERO -->
 <div class="product-detail-hero">
   <div class="container">
     <div class="breadcrumb">
@@ -143,25 +145,23 @@
       <div class="product-hero-left">
         <div class="product-hero-brand">{{ product.brand }}</div>
         <h1 class="product-hero-name">{{ product.name }}</h1>
-        <div class="product-hero-badges">
+        
+        <div class="product-category-wrapper" style="margin: 0.5rem 0 1.25rem 0; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--sage); text-transform: uppercase; letter-spacing: 0.05em;">
+              Category:
+          </span>
+          <span style="display: inline-block; background: rgba(126, 200, 69, 0.2); color: var(--lime); font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid rgba(126, 200, 69, 0.3); text-transform: capitalize;">
+              {{ product.product_category }}
+          </span>
+          
           {% for b in product.badges %}
-          <span class="badge badge-{{ b.color }}" style="font-size:0.8rem;">{{ b.label }}</span>
+            {% if b.label|trim|lower != product.product_category|trim|lower %}
+              <span class="badge badge-{{ b.color }}" style="font-size:0.8rem; padding: 0.25rem 0.65rem;">{{ b.label }}</span>
+            {% endif %}
           {% endfor %}
-        </div> 
-    <!-- <div class="product-category-wrapper" style="margin: 0.5rem 0 1.25rem 0; font-family: 'Plus Jakarta Sans', sans-serif;">
-    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
-        Category:
-    </span>
-    <span style="display: inline-block; background: var(--dew); color: var(--forest-mid); font-size: 0.85rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); margin-left: 0.4rem; text-transform: capitalize;">
-        {{ product.product_category }}
-    </span>
-    {% for b in product.badges %}
-          {% if b.label.lower() != product.product_category.lower() %}
-          <span class="badge badge-{{ b.color }}" style="font-size:0.8rem;">{{ b.label }}</span>
-          {% endif %}
-          {% endfor %}
-    </div> -->
+        </div>
       </div>
+      
       <div class="product-hero-right">
         <div class="hero-score-block">
           <div class="hero-grade grade-{{ product.health_grade }}" style="margin:0 auto 0.4rem;">{{ product.health_grade }}</div>
@@ -179,72 +179,37 @@
   </div>
 </div>
 
-<!-- DETAIL GRID -->
 <div class="detail-grid">
-  <!-- LEFT COLUMN -->
   <div>
-    <!-- NUTRITION -->
     <div class="detail-card">
       <div class="detail-card-title">📊 Nutritional Information <span style="font-size:0.75rem; font-weight:400; color: var(--text-muted);">(per 100g)</span></div>
-      {% if product.energy or product.protein %}
+      
+      {% if product.nutrition_info %}
       <div class="nutr-table">
-        {% if product.energy %}
-        <div class="nutr-row">
-          <span class="nutr-label">⚡ Energy</span>
-          <span class="nutr-val">{{ product.energy|int }} kcal</span>
-        </div>
-        {% endif %}
-        {% if product.fat %}
-        <div class="nutr-row">
-          <span class="nutr-label">🫙 Total Fat</span>
-          <div style="text-align:right; width:55%;">
-            <span class="nutr-val">{{ product.fat }}g</span>
-            <div class="nutr-bar-bg" style="margin-top:4px;">
-              <div class="nutr-bar-fill fat" style="width:{{ [product.fat * 2.5, 100]|min }}%; background: linear-gradient(90deg, #F59E0B, #EF4444);"></div>
-            </div>
+        {% for fact in product.nutrition_info.split(',') %}
+          {% if fact.strip() %}
+          <div class="nutr-row">
+            <span class="nutr-label">
+              🔹 {{ fact.split(':')[0].strip() if ':' in fact else fact.strip() }}
+            </span>
+            
+            {% if ':' in fact %}
+            <span class="nutr-val">
+              {{ fact.split(':')[1].strip() }}
+            </span>
+            {% endif %}
+            
           </div>
-        </div>
-        {% endif %}
-        {% if product.protein %}
-        <div class="nutr-row">
-          <span class="nutr-label">💪 Protein</span>
-          <div style="text-align:right; width:55%;">
-            <span class="nutr-val">{{ product.protein }}g</span>
-            <div class="nutr-bar-bg" style="margin-top:4px;">
-              <div class="nutr-bar-fill protein" style="width:{{ [product.protein * 5, 100]|min }}%; background: linear-gradient(90deg, #3B82F6, #6366F1);"></div>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-        {% if product.carbs %}
-        <div class="nutr-row">
-          <span class="nutr-label">🌾 Carbohydrates</span>
-          <div style="text-align:right; width:55%;">
-            <span class="nutr-val">{{ product.carbs }}g</span>
-            <div class="nutr-bar-bg" style="margin-top:4px;">
-              <div class="nutr-bar-fill carbs" style="width:{{ [product.carbs, 100]|min }}%; background: linear-gradient(90deg, #10B981, #84CC16);"></div>
-            </div>
-          </div>
-        </div>
-        {% endif %}
-        {% if product.sugars %}
-        <div class="nutr-row">
-          <span class="nutr-label">🍬 Of which Sugars</span>
-          <div style="text-align:right; width:55%;">
-            <span class="nutr-val" style="{% if product.sugars > 30 %}color:#EF4444{% elif product.sugars > 20 %}color:#F59E0B{% else %}color:#10B981{% endif %};">{{ product.sugars }}g</span>
-            <div class="nutr-bar-bg" style="margin-top:4px;">
-              <div class="nutr-bar-fill" style="width:{{ [product.sugars * 2, 100]|min }}%; background: linear-gradient(90deg, #EC4899, #F43F5E);"></div>
-            </div>
-          </div>
-        </div>
-        {% endif %}
+          {% endif %}
+        {% endfor %}
       </div>
       {% else %}
-      <p style="color: var(--text-muted); font-size:0.875rem;">Nutritional information not available for this product.</p>
+      <p style="color: var(--text-muted); font-size:0.875rem; font-style: italic;">
+        Nutritional data sentence metrics are currently unavailable for this item.
+      </p>
       {% endif %}
     </div>
 
-    <!-- INGREDIENT FLAGS -->
     <div class="detail-card">
       <div class="detail-card-title">🏷️ Ingredient Flags</div>
       <div class="flag-grid">
@@ -275,7 +240,6 @@
       </div>
     </div>
 
-    <!-- INGREDIENTS TEXT -->
     {% if product.ingredients %}
     <div class="detail-card">
       <div class="detail-card-title">📋 Ingredients</div>
@@ -284,9 +248,7 @@
     {% endif %}
   </div>
 
-  <!-- RIGHT COLUMN -->
   <div>
-    <!-- CONCERNS & POSITIVES -->
     {% if product.concerns %}
     <div class="detail-card">
       <div class="detail-card-title">⚠️ Concerns</div>
@@ -303,13 +265,14 @@
       <div class="detail-card-title">✨ Certifications & Positives</div>
       <div class="tag-list">
         {% for b in product.badges %}
-        <span class="badge badge-{{ b.color }}" style="font-size:0.8rem; padding:0.35rem 0.75rem;">{{ b.label }}</span>
+          {% if b.label|trim|lower != product.product_category|trim|lower %}
+          <span class="badge badge-{{ b.color }}" style="font-size:0.8rem; padding:0.35rem 0.75rem;">{{ b.label }}</span>
+          {% endif %}
         {% endfor %}
       </div>
     </div>
     {% endif %}
 
-    <!-- ORIGIN & SUSTAINABILITY -->
     <div class="detail-card">
       <div class="detail-card-title">🌍 Origin & Sustainability</div>
       {% if product.origin_country %}
@@ -332,7 +295,6 @@
       {% if product.cruelty_free %}<div class="origin-item"><span class="origin-icon">💚</span><span>Cruelty-free</span></div>{% endif %}
     </div>
 
-    <!-- SCORE EXPLANATION -->
     <div class="detail-card">
       <div class="detail-card-title">📈 Score Breakdown</div>
       <p style="font-size:0.82rem; color: var(--text-muted); margin-bottom:1rem; line-height:1.6;">
@@ -357,7 +319,6 @@
       </div>
     </div>
 
-    <!-- ACTIONS -->
     <div style="display:flex; flex-direction:column; gap:0.75rem;">
       <a href="/recommend?brand={{ product.brand }}" class="btn btn-outline" style="justify-content:center;">
         More by {{ product.brand }}
@@ -369,7 +330,6 @@
   </div>
 </div>
 
-<!-- SIMILAR PRODUCTS -->
 {% if similar %}
 <div style="max-width:1100px; margin:0 auto; padding:0 2rem 3rem;">
   <h2 style="font-family: 'Playfair Display', serif; font-size:1.5rem; color: var(--forest); margin-bottom:0.25rem;">Similar Products</h2>
