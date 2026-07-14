@@ -12,7 +12,7 @@ from sklearn.cluster import KMeans
 
 # ── Load data ────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(BASE_DIR, 'data.json'), 'r') as f:
+with open("data.json", "r", encoding="utf-8") as f:
     PRODUCTS = json.load(f)
 
 # ── Feature columns ──────────────────────────────────────────────────────────
